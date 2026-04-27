@@ -1,5 +1,6 @@
 import logging
 
+from bosesoundtouchapi.models import NowPlayingStatus  # type: ignore
 from bosesoundtouchapi.soundtouchclient import (  # type: ignore
     ContentItem as BCContentItem,
     SoundTouchClient,
@@ -206,3 +207,20 @@ class Speakers:
         except Exception as e:
             logger.error(f"Error stopping playback on device {device_id}: {e}")
             return False
+
+    def get_now_playing_status(self, device_id: str) -> NowPlayingStatus | None:
+        """Get the Now Playing information from the device.
+
+        Args:
+            device_id: The device being queried.
+
+        Returns:
+            A BoseSoundTouchApi NowPlayingStatus object.
+        """
+        cd = self.all_devices().get(device_id)
+        if not cd or not cd.st_device:
+            logger.error(f"Device {device_id} not found or not online")
+            return None
+
+        client = SoundTouchClient(cd.st_device)
+        return client.GetNowPlayingStatus()
