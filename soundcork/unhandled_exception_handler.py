@@ -146,4 +146,5 @@ class NotFoundHandler:
         return StarletteResponse(
             content=str(exc.detail) if exc.detail else "Not Found",
             status_code=exc.status_code,
+            headers=exc.headers,
         )
