@@ -107,6 +107,26 @@ When you're done with the virtual environment, you can type `deactivate` to leav
 
 You can verify the server by checking the `/docs` endpoint at your URL.
 
+### Optional basic auth for the admin and management routes
+
+The `/admin` and `/mgmt` routes are intended for human use, and by
+default they have no auth in front of them. soundcork is meant to run
+on a trusted home LAN behind a firewall (see [SECURITY.md](SECURITY.md)),
+but if you want a simple second layer you can turn on HTTP Basic auth
+by setting both of these env vars:
+
+	ADMIN_BASIC_AUTH_USER = "your-username"
+	ADMIN_BASIC_AUTH_PASSWORD = "your-password"
+
+When either is empty (the default), auth is disabled and behaviour is
+unchanged. When both are set, requests to `/admin/*` and `/mgmt/*`
+must include matching Basic credentials. Speaker-facing routes
+(`/marge/*`, `/bmx/*`, etc.) are never affected.
+
+This is intentionally minimal. It is not a substitute for running
+soundcork only on a trusted network, and it does not protect the
+traffic in transit unless you also run behind TLS.
+
 ### Setting your SoundTouch device to use the soundcork server
 
 For purposes of this example, let's say that you've set up a soundcork server on your local server available via hostname ```soundcork.local.example.com``` and running on port 8000.  Let's also say that you want a data dir at ```/home/soundcork/db```.
