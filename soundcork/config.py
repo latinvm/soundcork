@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     #  used for development/debugging
     unhandled_log_dir: str = ""
 
+    # Optional HTTP Basic auth for the /admin and /mgmt routers.
+    # Both must be set to enable. Intended for trusted LAN deployments.
+    admin_basic_auth_user: str = ""
+    admin_basic_auth_password: str = ""
+
     model_config = SettingsConfigDict(
         # `.env.private` takes priority over `.env.shared`
         env_file=(".env.shared", ".env.private")

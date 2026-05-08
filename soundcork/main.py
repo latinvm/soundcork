@@ -16,6 +16,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response as StarletteResponse
 
 from soundcork.admin import get_admin_router
+from soundcork.auth import basic_auth_dependencies
 from soundcork.bmx import (
     play_custom_stream,
     tunein_navigate_profile_v1,
@@ -126,7 +127,11 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-app.include_router(management_router)
+# Optional HTTP Basic auth for the human-facing admin and management
+# routers. Disabled (empty list) unless both env vars are set.
+admin_auth_deps = basic_auth_dependencies(settings)
+
+app.include_router(management_router, dependencies=admin_auth_deps)
 
 
 startup_timestamp = int(datetime.now().timestamp() * 1000)
@@ -859,7 +864,7 @@ app.include_router(get_groups_service_router(datastore))
 
 
 #  include admin router
-app.include_router(get_admin_router(datastore, speakers))
+app.include_router(get_admin_router(datastore, speakers), dependencies=admin_auth_deps)
 
 #  include miniapp router
 app.include_router(get_miniapp_router(datastore, speakers))

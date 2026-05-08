@@ -87,8 +87,9 @@ async def spotify_callback(
 ):
     """Server-side OAuth callback.
 
-    This endpoint is NOT protected by Basic Auth because Spotify
-    redirects the user's browser here directly.
+    Spotify redirects the user's browser here directly. When optional
+    Basic Auth is enabled on the /mgmt router, the browser re-sends the
+    credentials cached from the earlier /spotify/init redirect.
     """
     if error:
         return HTMLResponse(
