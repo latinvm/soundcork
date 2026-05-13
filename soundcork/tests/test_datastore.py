@@ -422,6 +422,7 @@ def test_get_presets_allows_empty_item_name(
             <ContentItem source="INTERNET_RADIO" type="uri" location="http://a" isPresetable="true">
               <itemName />
               <containerArt></containerArt>
+              <username>Beats Radio</username>
             </ContentItem>
           </preset>
         </presets>
