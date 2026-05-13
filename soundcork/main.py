@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import re
@@ -17,6 +18,7 @@ from starlette.responses import Response as StarletteResponse
 
 from soundcork.admin import get_admin_router
 from soundcork.bmx import (
+    bmx_services_json,
     play_custom_stream,
     tunein_navigate_profile_v1,
     tunein_navigate_v1,
@@ -63,6 +65,7 @@ from soundcork.model import (
     BmxPodcastInfoResponse,
     BmxResponse,
     BoseXMLResponse,
+    Service,
 )
 from soundcork.ui.speakers import Speakers
 from soundcork.unhandled_exception_handler import NotFoundHandler
@@ -663,15 +666,24 @@ async def delete_account_source(
 @app.get("/bmx/registry/v1/services", response_model_exclude_none=True, tags=["bmx"])
 def bmx_services() -> BmxResponse:
 
-    with open("bmx_services.json", "r") as file:
-        bmx_response_json = file.read()
-        bmx_response_json = bmx_response_json.replace(
-            "{MEDIA_SERVER}", f"{settings.base_url}/media"
-        ).replace("{BMX_SERVER}", settings.base_url)
-        # TODO:  we're sending askAgainAfter hardcoded, but that value actually
-        # varies.
-        bmx_response = BmxResponse.model_validate_json(bmx_response_json)
-        return bmx_response
+    bmx_response_json = bmx_services_json(settings)
+
+    # TODO:  we're sending askAgainAfter hardcoded, but that value actually
+    # varies.
+    bmx_response = BmxResponse.model_validate_json(bmx_response_json)
+    return bmx_response
+
+
+@app.get(
+    "/bmx/tunein",
+    response_model_exclude_none=True,
+    tags=["bmx"],
+)
+def bmx_tunein() -> Service:
+    bmx_json = bmx_services_json(settings)
+    bmx_json_obj = json.loads(bmx_json)
+    # this is hardcoded so we know where it is in the array
+    return bmx_json_obj["bmx_services"][0]
 
 
 @app.get(
@@ -747,6 +759,16 @@ def bmx_tunein_search_v1(request: Request) -> BmxNavResponse:
     return tunein_search_v1(request.query_params.get("q", ""))
 
 
+@app.get(
+    "/core02/svc-bmx-adapter-orion/prod/orion",
+    response_model_exclude_none=True,
+    tags=["bmx"],
+)
+def bmx_local_internet_radio() -> Service:
+    bmx_json = bmx_services_json(settings)
+    bmx_json_obj = json.loads(bmx_json)
+    # this is hardcoded so we know where it is in the array
+    return bmx_json_obj["bmx_services"][1]
 @app.post(
     "/bmx/tunein/v1/report",
     status_code=HTTPStatus.OK,
@@ -772,6 +794,18 @@ def bmx_media_file(filename: str) -> FileResponse:
         return FileResponse(file_path)
 
     raise HTTPException(status_code=404, detail="not found")
+
+
+@app.get(
+    "/core02/svc-bmx-adapter-siriusxm-everest-eco1/prod/live-adapter",
+    response_model_exclude_none=True,
+    tags=["bmx"],
+)
+def bmx_siriusxm() -> Service:
+    bmx_json = bmx_services_json(settings)
+    bmx_json_obj = json.loads(bmx_json)
+    # this is hardcoded so we know where it is in the array
+    return bmx_json_obj["bmx_services"][2]
 
 
 @app.get("/updates/soundtouch", tags=["swupdate"])
