@@ -94,6 +94,9 @@ def update_preset(
 
     # load the preset to add
 
+    # 'name' and 'username' are the human-readable name of the preset, interchangeably.
+    # - Stockholm (the mobile app), when setting a preset, calls this field 'username'
+    # - The speakers themselves, when setting a preset, calls this field 'name'
     name = strip_element_text(new_preset_elem.find("name")) or strip_element_text(
         new_preset_elem.find("username")
     )
