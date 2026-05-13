@@ -94,10 +94,13 @@ def update_preset(
 
     # load the preset to add
 
-    name = strip_element_text(new_preset_elem.find("name"))
+    # 'name' and 'username' are the human-readable name of the preset, interchangeably.
+    # - Stockholm (the mobile app), when setting a preset, calls this field 'username'
+    # - The speakers themselves, when setting a preset, calls this field 'name'
+    name = strip_element_text(new_preset_elem.find("name")) or strip_element_text(
+        new_preset_elem.find("username")
+    )
     source_id = strip_element_text(new_preset_elem.find("sourceid"))
-    # we could use username to match source maybe?
-    # username = new_preset_elem.find("username").text
     location = strip_element_text(new_preset_elem.find("location"))
     content_item_type = strip_element_text(new_preset_elem.find("contentItemType"))
 
